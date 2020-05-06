@@ -8,8 +8,8 @@ from functools import partial
 import torch
 import torch.nn as nn
 
-import matching
-import transform
+from .matching import get_closest_matches, get_greedy_matches, get_hungarian_matches, get_mnn_matches
+from .transform import fit_transform_affine, fit_transform_autoencoder
 
 class AffineSCIPR(object):
     def __init__(self, n_iter=20, n_epochs_per_iter=1000, matching_algo='mnn',
@@ -71,19 +71,19 @@ class AffineSCIPR(object):
     def get_matching_fcn(self):
         if self.matching_algo == 'closest':
             print('Using CLOSEST matching')
-            return matching.get_closest_matches
+            return get_closest_matches
         elif self.matching_algo == 'hungarian':
             print('Using HUNGARIAN matching')
-            return partial(matching.get_hungarian_matches,
+            return partial(get_hungarian_matches,
                            frac_to_match=self.frac_matches_to_keep)
         elif self.matching_algo == 'greedy':
             print('Using GREEDY matching')
-            return partial(matching.get_greedy_matches,
+            return partial(get_greedy_matches,
                            source_match_threshold=self.source_match_thresh,
                            target_match_limit=self.target_match_limit)
         elif self.matching_algo == 'mnn':
             print('Using MNN matching')
-            return partial(matching.get_mnn_matches)
+            return partial(get_mnn_matches)
 
 
 class StackedAutoEncoderSCIPR(object):
@@ -154,16 +154,16 @@ class StackedAutoEncoderSCIPR(object):
     def get_matching_fcn(self):
         if self.matching_algo == 'closest':
             print('Using CLOSEST matching')
-            return matching.get_closest_matches
+            return get_closest_matches
         elif self.matching_algo == 'hungarian':
             print('Using HUNGARIAN matching')
-            return partial(matching.get_hungarian_matches,
+            return partial(get_hungarian_matches,
                            frac_to_match=self.frac_matches_to_keep)
         elif self.matching_algo == 'greedy':
             print('Using GREEDY matching')
-            return partial(matching.get_greedy_matches,
+            return partial(get_greedy_matches,
                            source_match_threshold=self.source_match_thresh,
                            target_match_limit=self.target_match_limit)
         elif self.matching_algo == 'mnn':
             print('Using MNN matching')
-            return partial(matching.get_mnn_matches)
+            return partial(get_mnn_matches)
