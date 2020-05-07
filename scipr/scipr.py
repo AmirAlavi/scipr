@@ -40,7 +40,7 @@ class AffineSCIPR(object):
             else:
                 a_idx, b_idx, distances = matching_fcn(A, B)
             print(f'Step: {i+1}/{self.n_iter}, pairs: {len(a_idx)}, mean_dist: {np.mean(distances)}')
-            theta_new, W, bias = transform.fit_transform_affine(A[a_idx], B[b_idx], optim=self.opt, lr=self.lr, epochs=self.n_epochs_per_iter)
+            theta_new, W, bias = fit_transform_affine(A[a_idx], B[b_idx], optim=self.opt, lr=self.lr, epochs=self.n_epochs_per_iter)
             A = np.dot(W, A.T).T + bias
             if theta is None:
                 theta = theta_new
@@ -123,7 +123,7 @@ class StackedAutoEncoderSCIPR(object):
                 a_idx, b_idx, distances = matching_fcn(A, B)
             print(f'Step: {i+1}/{self.n_iter}, pairs: {len(a_idx)}, mean_dist: {np.mean(distances)}')
 
-            autoencoder = transform.fit_transform_autoencoder(A[a_idx], B[b_idx], hidden_sizes=self.hidden_sizes, act=self.act, optim=self.opt, lr=self.lr, epochs=self.n_epochs_per_iter)
+            autoencoder = fit_transform_autoencoder(A[a_idx], B[b_idx], hidden_sizes=self.hidden_sizes, act=self.act, optim=self.opt, lr=self.lr, epochs=self.n_epochs_per_iter)
             print(autoencoder)
             self.autoencoders_.add_module(f'autoencoder_{i}', autoencoder)
             new_A = torch.from_numpy(A).float().to(self.device_)
