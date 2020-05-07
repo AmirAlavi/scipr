@@ -11,5 +11,7 @@ sphinx:
 
 # Set requirements required to build your docs
 python:
-  - method: pip
-    path: .
+  version: 3.8
+  install:
+    - method: pip
+      path: .
