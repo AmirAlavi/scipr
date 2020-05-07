@@ -1,4 +1,4 @@
-Welcome to scipr's documentation!
+Single Cell Iterative Point set Registration (SCIPR)
 ======================================
 
 .. toctree::
