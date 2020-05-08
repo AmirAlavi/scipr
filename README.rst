@@ -14,7 +14,8 @@ scipr
 
 This repository is currently under construction, stay tuned for a PyPi release!
 
-.. image:: https://media.giphy.com/media/fVeAI9dyD5ssIFyOyM/giphy.gif
+.. image:: https://media.giphy.com/media/fVeAI9dyD5ssIFyOyM/200.gif
+        :alt: Under Construction
 
 
 
