@@ -6,7 +6,7 @@ scipr
         :target: https://pypi.python.org/pypi/scipr
 
 .. image:: https://img.shields.io/travis/amiralavi/scipr.svg
-        :target: https://travis-ci.com/amiralavi/scipr
+        :target: https://travis-ci.org/amiralavi/scipr
 
 .. image:: https://readthedocs.org/projects/scipr/badge/?version=latest
         :target: https://scipr.readthedocs.io/en/latest/?badge=latest
