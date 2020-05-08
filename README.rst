@@ -2,7 +2,6 @@
 scipr
 =====
 
-
 .. image:: https://img.shields.io/pypi/v/scipr.svg
         :target: https://pypi.python.org/pypi/scipr
 
@@ -13,6 +12,9 @@ scipr
         :target: https://scipr.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+This repository is currently under construction, stay tuned for a PyPi release!
+
+.. image:: https://media.giphy.com/media/fVeAI9dyD5ssIFyOyM/giphy.gif
 
 
 
