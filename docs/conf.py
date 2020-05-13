@@ -31,7 +31,7 @@ import scipr
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -89,7 +89,16 @@ html_theme = 'alabaster'
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'logo': 'logo.png',
+    'logo_name': True,
+    'logo_text_align': 'center',
+    'description': 'Learning scRNA-seq alignments',
+    'fixed_sidebar': True,
+    'github_user': 'AmirAlavi',
+    'github_repo': 'scipr',
+    'github_button': True
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -159,4 +168,5 @@ texinfo_documents = [
 ]
 
 
-
+# -- Options for autodoc output ----------------------------------------
+autodoc_member_order = 'bysource'
