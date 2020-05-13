@@ -12,24 +12,11 @@ scipr
         :target: https://scipr.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-This repository is currently under construction, stay tuned for a PyPi release!
-
-.. image:: https://media.giphy.com/media/fVeAI9dyD5ssIFyOyM/200.gif
-        :alt: Under Construction
-
-
-
 Single Cell Iterative Point set Registration (SCIPR)
 
 
 * Free software: BSD license
 * Documentation: https://scipr.readthedocs.io.
-
-
-Features
---------
-
-* TODO
 
 Credits
 -------
