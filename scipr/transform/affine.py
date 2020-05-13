@@ -5,6 +5,23 @@ from .base import Transformer
 
 
 class Affine(Transformer):
+    """ Use an affine transformation function to align the pairs of cells.
+
+    The affine function is of the form ``f(x) = Wx + b``, where ``W`` and ``b``
+    are the learnable weights. ``W`` has the shape (genes, genes) and ``b``
+    (the bias term) has shape (genes,).
+
+    Parameters
+    ----------
+    optim : {'adam', 'sgd'}
+        Which torch optimizer to use.
+
+    lr : float
+        Learning rate to use in gradient descent.
+
+    epochs : int
+        Number of iterations to run gradient descent.
+    """
     def __init__(self, optim='adam', lr=1e-3, epochs=1000):
         self.optim = optim
         self.lr = lr
@@ -51,12 +68,18 @@ class Affine(Transformer):
         bias = model['theta'][:d, -1]
         return np.dot(W, A.T).T + bias
 
-    def chain(self, step_model, step_number):
-        if self.model is None:
-            self.model = step_model
+    def chain(self, model, step_model, step_number):
+        # Affine functions can be composed easily when represented in their
+        # augmented matrix form, simply left multiply their (augmented)
+        # transformation matrices by each other.
+        if model is None:
+            return step_model
         else:
-            self.model['theta'] = np.dot(step_model['theta'],
-                                         self.model['theta'])
+            model['theta'] = np.dot(step_model['theta'],
+                                    model['theta'])
+            return model
 
-    def finalize(self, A_orig, A_final):
-        pass
+    def finalize(self, model, A_orig, A_final):
+        # Since we've been updating the overal model in the chain function,
+        # we don't need to do anything here.
+        return model

@@ -33,7 +33,7 @@ class TestScipr(unittest.TestCase):
         model = scipr.SCIPR(match_algo=self.match,
                             transform_algo=self.transform,
                             input_normalization='l2')
-        normalized = model.apply_input_normalization(self.A)
+        normalized = model._apply_input_normalization(self.A)
         norm = np.linalg.norm(normalized, axis=1)
         self.assertTrue(np.allclose(norm, 1.0))
 
@@ -42,7 +42,7 @@ class TestScipr(unittest.TestCase):
         model = scipr.SCIPR(match_algo=self.match,
                             transform_algo=self.transform,
                             input_normalization='std')
-        normalized = model.apply_input_normalization(self.A)
+        normalized = model._apply_input_normalization(self.A)
         means = np.mean(normalized, axis=0)
         stds = np.std(normalized, axis=0)
         self.assertTrue(np.allclose(means, 0.))
@@ -53,7 +53,7 @@ class TestScipr(unittest.TestCase):
         model = scipr.SCIPR(match_algo=self.match,
                             transform_algo=self.transform,
                             input_normalization='log')
-        normalized = model.apply_input_normalization(self.A)
+        normalized = model._apply_input_normalization(self.A)
         feature_counts = np.expand_dims(np.sum(self.A, axis=1), 1)
         correct = np.log1p((self.A / feature_counts) * 10000)
         self.assertTrue(np.allclose(normalized, correct))

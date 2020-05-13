@@ -11,16 +11,16 @@ activations = {
 }
 
 
-class Autoencoder(nn.Module):
+class _Autoencoder(nn.Module):
     def __init__(self, input_size, layer_sizes, act='tanh', dropout=0.0,
-                 batch_norm=False, last_layer_linear=False, tie_weights=True):
-        super(Autoencoder, self).__init__()
+                 batch_norm=False, last_layer_act='tanh', tie_weights=True):
+        super(_Autoencoder, self).__init__()
         self.input_size = input_size
         self.layer_sizes = layer_sizes
-        self.act = activations[act]
+        self.act = act
         self.dropout = dropout
         self.batch_norm = batch_norm
-        self.last_layer_linear = last_layer_linear
+        self.last_layer_act = last_layer_act
         self.tie_weights = tie_weights
 
         self.encoder = nn.Sequential()
@@ -61,7 +61,7 @@ class Autoencoder(nn.Module):
                 # if decode_layer_count < len(self.layer_sizes) - 1:
                 # if True:
                 if not (decode_layer_count == (len(self.layer_sizes) - 1) and
-                   self.last_layer_linear):
+                   self.last_layer_act is None):
                     # BN
                     if self.batch_norm:
                         self.decoder.add_module(
@@ -69,8 +69,9 @@ class Autoencoder(nn.Module):
                             nn.BatchNorm1d(size))
                     # Finally, non-linearity
                     self.decoder.add_module(
-                        'dec_{}_{}'.format(act, decode_layer_count),
-                        activations[act]())
+                        'dec_{}_{}'.format(last_layer_act,
+                                           decode_layer_count),
+                        activations[last_layer_act]())
                 prev_size = size
                 decode_layer_count += 1
 
@@ -81,10 +82,57 @@ class Autoencoder(nn.Module):
 
 
 class StackedAutoEncoder(Transformer):
-    def __init__(self, hidden_sizes=[64], act='leaky_relu', optim='adam',
-                 lr=1e-3, epochs=1000):
+    """Use multiple autoencoders to align the pairs of cells.
+
+    Fit a "stack" of autoencoders, the output of one feeding in as the input
+    into the next one (thereby "composing" them). At each step of SCIPR, the
+    next autoencoder is fitted, and then added onto the overall stack. Since
+    these are autoencoders, the output dimensions of each are the same as the
+    input, so the dimensions are maintained.
+
+    Will automatically search for and use a GPU if available.
+
+    Parameters
+    ----------
+    hidden_sizes : list of int
+        The sizes (widths) of the hidden layers of each autoencoder. This is
+        one side of the "funnel" of the autoencoder architecture, and the other
+        side is built to be symmetric (same as ``hidden_sizes`` but in
+        reverse).
+
+    act : {'leaky_relu', 'relu', 'sigmoid', 'tanh'}
+        Which non-linear activation function to use for the autoencoders.
+
+    last_layer_act : {None, 'leaky_relu', 'relu', 'sigmoid', 'tanh'}
+        Which non-linear activation function to use for the final layer
+        (output) of the autoencoders. ``None`` means no non-linearity. See
+        Warnings below.
+
+    optim : {'adam', 'sgd'}
+        Which torch optimizer to use.
+
+    lr : float
+        Learning rate to use in gradient descent.
+
+    epochs : int
+        Number of iterations to run gradient descent.
+
+    Warnings
+    --------
+    Be aware that your choice of input normalization to SCIPR might have
+    implications for your choice of the ``last_layer_act`` parameter. For
+    exmaple, If your input normalization scales your input features to
+    [0, 1.0], then you may want your final layer to use a sigmoid activation.
+    Or if your input normalization allows for input features to be (-\\infty,
+    +\\infty), then having `None` as the last layer's activation might be best.
+    This is just something to keep in mind, ultimately you may choose what
+    performs the best alignment for you.
+    """
+    def __init__(self, hidden_sizes=[64], act='leaky_relu',
+                 last_layer_act=None, optim='adam', lr=1e-3, epochs=1000):
         self.hidden_sizes = hidden_sizes
         self.act = act
+        self.last_layer_act = last_layer_act
         self.optim = optim
         self.lr = lr
         self.epochs = epochs
@@ -97,9 +145,9 @@ class StackedAutoEncoder(Transformer):
         d = A.shape[1]
         A = torch.from_numpy(A).float().to(self.device)
         B = torch.from_numpy(B).float().to(self.device)
-        f = Autoencoder(input_size=d, layer_sizes=self.hidden_sizes,
-                        act=self.act, dropout=0.0, batch_norm=False,
-                        last_layer_linear=False, tie_weights=True)
+        f = _Autoencoder(input_size=d, layer_sizes=self.hidden_sizes,
+                         act=self.act, dropout=0.0, batch_norm=False,
+                         last_layer_act=self.last_layer_act, tie_weights=True)
         f.to(self.device)
         if self.optim == 'adam':
             optimizer = torch.optim.Adam(f.parameters(), lr=self.lr)
@@ -121,18 +169,18 @@ class StackedAutoEncoder(Transformer):
 
     def transform(self, model, A):
         A = torch.from_numpy(A).float().to(self.device)
-        # self.autoencoders_.eval()
         model['autoencoder'].eval()
         A = model['autoencoder'].forward(A)
         A = A.detach().cpu().numpy()
         return A
 
-    def chain(self, step_model, step_number):
-        if self.model is None:
-            self.model = {'autoencoder': nn.Sequential()}
-        self.model['autoencoder'].add_module(f'autoencoder_{step_number}',
-                                             step_model['autoencoder'])
-        print(self.model)
+    def chain(self, model, step_model, step_number):
+        if model is None:
+            model = {'autoencoder': nn.Sequential()}
+        model['autoencoder'].add_module(f'autoencoder_{step_number}',
+                                        step_model['autoencoder'])
+        return model
 
-    def finalize(self, A_orig, A_final):
-        pass
+    def finalize(self, model, A_orig, A_final):
+        print(model)
+        return model

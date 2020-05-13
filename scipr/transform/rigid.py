@@ -4,6 +4,11 @@ from .base import Transformer
 
 
 class Rigid(Transformer):
+    """Use a rigid transformation function to align the pairs of cells.
+
+    Rigid trasformations are constrained to the operations of rotation,
+    reﬂection, translation, and combinations of these.
+    """
     def __init__(self):
         super().__init__()
 
@@ -32,8 +37,12 @@ class Rigid(Transformer):
     def transform(self, model, A):
         return np.dot(model['R'], A.T).T + model['t']
 
-    def chain(self, step_model, step_number):
-        pass
+    def chain(self, model, step_model, step_number):
+        # For rigid transforms, since we can learn the final function simply
+        # by learning the optimal rotation from the original A to the final A,
+        # we don't need to maintain an overall model during fitting. See
+        # finalize.
+        return None
 
-    def finalize(self, A_orig, A_final):
-        self.model = self.fit(A_orig, A_final)
+    def finalize(self, model, A_orig, A_final):
+        return self.fit(A_orig, A_final)
