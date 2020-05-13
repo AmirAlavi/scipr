@@ -80,7 +80,7 @@ class Hungarian(Match):
     frac_to_match : float
         If not 1.0, then this is the fraction of the matches to keep. All of
         the matches are sorted from smallest distance to largest, and then only
-        the top ```n`` are returned, where ``n`` is the ``frac_to_match``
+        the top ``n`` are returned, where ``n`` is the ``frac_to_match``
         portion of the smaller of the two sets of cells.
     """
     def __init__(self, frac_to_match=1.0):
