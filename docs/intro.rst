@@ -81,6 +81,19 @@ suited to scRNA-seq data::
     model.fit(batch_A, batch_B)
     batch_A_aligned = model.trasform(batch_A)
 
+*******
+Logging
+*******
+
+scipr uses Python's built-in logging module to report informational messages
+and training metrics (e.g. loss values at each gradient descent iteration), and
+so normally you should see nothing printed to `stdout` (unless it's warning
+message). If you would like to see this informational text, configure the
+Python logger with the appropriate level like so::
+
+   import logging
+   logging.basicConfig(level=logging.INFO)
+
 .. rubric:: References
 
 .. [GHJV94] Gamma, E., Helm, R., Johnson, R., & Vlissides, J. (1994).

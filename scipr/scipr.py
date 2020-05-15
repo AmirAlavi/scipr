@@ -1,4 +1,6 @@
 # iterative point set registration methods for scRNA-seq alignment
+import logging
+
 from sklearn.preprocessing import StandardScaler, normalize
 import numpy as np
 from scipy import spatial
@@ -54,12 +56,15 @@ class SCIPR(object):
             aligned onto ``B``, where ``B`` is unchanged, and remains a
             stationary "reference". Dimensions are (cellsB, genes).
         """
+        log = logging.getLogger(__name__)
         A = self._apply_input_normalization(A)
         B = self._apply_input_normalization(B)
         kd_B = spatial.cKDTree(B)
         A_orig = A
         for i in range(self.n_iter):
             a_idx, b_idx, distances = self.match_algo(A, B, kd_B)
+            log.info(f'SCIPR step {i}, n-pairs: {len(a_idx)}, ' +
+                     f'avg distances: {np.mean(distances)}')
             step_model = self.transform_algo._fit_step(A[a_idx], B[b_idx], i)
             A = self.transform_algo.transform(step_model, A)
         self.transform_algo._finalize(A_orig, A)
@@ -92,10 +97,14 @@ class SCIPR(object):
         return self.transform_algo._transform(A)
 
     def _apply_input_normalization(self, X):
+        log = logging.getLogger(__name__)
         if self.input_normalization == 'std':
+            log.info('Applying Standardization normalization')
             scaler = StandardScaler().fit(X)
             return scaler.transform(X)
         elif self.input_normalization == 'l2':
+            log.info('Applying L2 normalization')
             return normalize(X)
         elif self.input_normalization == 'log':
+            log.info('Applying log normalization')
             return np.log1p(X / X.sum(axis=1, keepdims=True) * 1e4)

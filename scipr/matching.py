@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import math
 import datetime
 from collections import defaultdict
+import logging
 
 from scipy import spatial
 from scipy.optimize import linear_sum_assignment
@@ -63,8 +64,13 @@ class Closest(Match):
     # TODO: add 'prune_matches' option in a constructor here
 
     def match(self, A, B, kd_tree_B):
+        log = logging.getLogger(__name__)
+        t0 = datetime.datetime.now()
         distances, B_indices = kd_tree_B.query(A)
         A_indices = np.arange(A.shape[0])
+        t1 = datetime.datetime.now()
+        time_str = _pretty_tdelta(t1 - t0)
+        log.info('Closest matching took ' + time_str)
         return A_indices, B_indices, distances
 
 
@@ -87,12 +93,13 @@ class Hungarian(Match):
         self.frac_to_match = frac_to_match
 
     def match(self, A, B, kd_tree_B):
+        log = logging.getLogger(__name__)
         t0 = datetime.datetime.now()
         dist_mat = spatial.distance.cdist(A, B)
         A_indices, B_indices = linear_sum_assignment(dist_mat)
         t1 = datetime.datetime.now()
         time_str = _pretty_tdelta(t1 - t0)
-        print('hungarian matching took ' + time_str)
+        log.info('Hungarian matching took ' + time_str)
         distances = dist_mat[A_indices, B_indices]
         if self.frac_to_match < 1.0:
             n_to_match = math.floor(self.frac_to_match * min(A.shape[0],
@@ -129,6 +136,8 @@ class Greedy(Match):
         self.beta = beta
 
     def match(self, A, B, kd_tree_B):
+        log = logging.getLogger(__name__)
+        t0 = datetime.datetime.now()
         dist_mat = spatial.distance.cdist(A, B)
         # Select pairs that should be matched between set A and B,
         # iteratively building up a mask that selects those matches
@@ -155,6 +164,9 @@ class Greedy(Match):
                 break
         A_indices, B_indices = np.where(mask == 1)
         distances = dist_mat[A_indices, B_indices]
+        t1 = datetime.datetime.now()
+        time_str = _pretty_tdelta(t1 - t0)
+        log.info('Greedy matching took ' + time_str)
         return A_indices, B_indices, distances
 
 
@@ -176,6 +188,7 @@ class MNN(Match):
         self.k = k
 
     def match(self, A, B, kd_tree_B):
+        log = logging.getLogger(__name__)
         t0 = datetime.datetime.now()
         kd_A = spatial.cKDTree(A)
 
@@ -191,7 +204,7 @@ class MNN(Match):
 
         t1 = datetime.datetime.now()
         time_str = _pretty_tdelta(t1 - t0)
-        print('mnn matching took ' + time_str)
+        log.info('MNN matching took ' + time_str)
         return np.array(A_indices), np.array(B_indices), np.array(distances)
 
 

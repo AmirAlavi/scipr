@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import torch
 
@@ -29,9 +31,10 @@ class Affine(Transformer):
         super().__init__()
 
     def fit(self, A, B):
+        log = logging.getLogger(__name__)
         d = A.shape[1]
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print('Using device {}'.format(device))
+        log.info(f'Using device {device}')
         A = torch.from_numpy(A).float().to(device)
         B = torch.from_numpy(B).float().to(device)
         f = torch.nn.Sequential()
@@ -47,7 +50,7 @@ class Affine(Transformer):
             optimizer.zero_grad()
             loss = torch.mean(torch.norm(f(A) - B, p=2, dim=1)**2)
             if e % 100 == 0:
-                print(f'\tEpoch: {e}/{self.epochs}, loss: {loss.item()}')
+                log.info(f'\tEpoch: {e}/{self.epochs}, loss: {loss.item()}')
             loss.backward()
             optimizer.step()
         # theta is the augmented matrix wich includes weights W and bias in
