@@ -6,6 +6,8 @@
 import unittest
 import io
 from contextlib import redirect_stdout
+from pathlib import Path
+import tempfile
 
 import numpy as np
 
@@ -89,3 +91,31 @@ class TestScipr(unittest.TestCase):
             model.fit(self.A, self.B)
             model.transform(self.A)
         self.assertEqual(f.getvalue(), '')
+
+    def test_006_tensorboard_auto_directory(self):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            model = scipr.SCIPR(match_algo=self.match,
+                                transform_algo=self.rigid_transform,
+                                input_normalization='l2',
+                                n_iter=2)
+            model.fit(self.A, self.B, tensorboard=True)
+        stdout = f.getvalue()
+        self.assertIn('WARN', stdout)
+        tboard_path = Path(stdout.split()[-1])
+        self.assertTrue(tboard_path.exists())
+        event_file = list(tboard_path.iterdir())[-1].name
+        self.assertIn('events.out.tfevents', event_file)
+
+    def test_007_tensorboard_custom_directory(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tboard_path = Path(tmp_dir)
+            model = scipr.SCIPR(match_algo=self.match,
+                                transform_algo=self.rigid_transform,
+                                input_normalization='l2',
+                                n_iter=2)
+            model.fit(self.A, self.B, tensorboard=True,
+                      tensorboard_dir=tboard_path)
+            self.assertTrue(tboard_path.exists())
+            event_file = list(tboard_path.iterdir())[-1].name
+            self.assertIn('events.out.tfevents', event_file)
