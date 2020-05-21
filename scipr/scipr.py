@@ -98,8 +98,38 @@ class SCIPR(object):
         self.transform_algo._finalize(A_orig, A)
         self.fitted = True
 
-    def fit_adata(self, adata, batch_key, source, target):
-        raise NotImplementedError
+    def fit_adata(self, adata, batch_key, source, target, tensorboard=False,
+                  tensorboard_dir=None):
+        """Fit the model to align to a reference batch, taking AnnData input.
+
+        Parameters
+        ----------
+        adata : anndata.AnnData
+            Annotated data object containing the two "source" and "target" cell
+            batches. Dimensions are (cells, genes).
+
+        batch_key : str
+            The name of the column in `adata.obs` which contains the batch
+            annotations.
+
+        source,target : str
+            The batch annotation values of the "source" and "target" batches.
+
+        tensorboard : bool
+            If True, enable tensorboard logging of SCIPR algorithm metrics.
+
+        tensorboard_dir : None or str
+            If None, will use an automatically generated folder to store
+            tensorboard event files. If specified, will place event files in
+            the specified directory (creates it if it doesn't already exist).
+
+        See Also
+        --------
+        fit
+        """
+        A = adata[adata.obs[batch_key] == source].X
+        B = adata[adata.obs[batch_key] == target].X
+        self.fit(A, B, tensorboard, tensorboard_dir)
 
     def transform(self, A):
         """Apply alignment to a batch of cells.
@@ -128,7 +158,61 @@ class SCIPR(object):
         return self.transform_algo._transform(A)
 
     def transform_adata(self, adata, batch_key, batch, inplace=False):
-        raise NotImplementedError
+        """Apply alignment to a batch of cells, taking AnnData input.
+
+        Cells are transformed to be aligned to the same "reference" batch from
+        the :meth:`fit` method.
+
+        Parameters
+        ----------
+        adata : anndata.AnnData
+            Annotated data object containing the batch of cells to align.
+            Dimensions are (cells, genes).
+
+        batch_key : str
+            The name of the column in `adata.obs` which contains the batch
+            annotations.
+
+        batch : str
+            The batch annotation value of the cells to align.
+
+        inplace : bool
+            If True, then replace the cells (observations) in adata.X which
+            have the `batch` annotation with the new transformed values. Beware
+            that these transformed cells will have been first normalized then
+            transformed, so they are transformed to align to a *normalized*
+            representation (i.e. using the normalizatio specified in the
+            constructor). Whereas the other cells in `adata` may not be in this
+            normalized representation.
+
+            Otherwise, return the tuple (transformed numpy.ndarray,
+            row indexer into adata of the transformed cells).
+
+        Returns
+        -------
+        transformed : numpy.ndarray
+            The aligned batch of cells, same shape as input batch. Only
+            provided if `inplace` is True.
+
+        indexer : numpy.ndarray
+            Boolean row indexer into `adata` of the transformed cells. Only
+            provided if `inplace` is True.
+
+        Raises
+        ------
+        RuntimeError
+            If this method is called before :meth:`fit` method.
+
+        See Also
+        --------
+        transform
+        """
+        indexer = adata.obs[batch_key] == batch
+        transformed = self.transform(adata[indexer].X)
+        if inplace:
+            adata.X[indexer, :] = transformed
+        else:
+            return transformed, indexer
 
     def _apply_input_normalization(self, X):
         log = logging.getLogger(__name__)

@@ -135,41 +135,32 @@ class TestScipr(unittest.TestCase):
             event_file = list(tboard_path.iterdir())[-1].name
             self.assertIn('events.out.tfevents', event_file)
 
-    def test_009_anndata_transform(self):
-        """Test fit and transform with AnnData is equivalent to numpy"""
+    def _test_anndata_helper(self):
         model = scipr.SCIPR(match_algo=self.match,
-                            transform_algo=self.rigid_transform,
+                            transform_algo=self.affine_transform,
+                            n_iter=3,
                             input_normalization='l2')
         adata = anndata.AnnData(X=np.concatenate([self.A, self.B], axis=0),
-                                obs={'batch': (['A'] * self.A.shape[0]) +
-                                     (['B'] * self.B.shape[0])})
+                                obs={
+                                    'batch': (['A'] * self.A.shape[0]) +
+                                             (['B'] * self.B.shape[0])
+                                },
+                                dtype=self.A.dtype)
         model.fit_adata(adata, 'batch', 'A', 'B')
-        transformed, idx = model.transform_adata(adata, 'batch', 'A')
-        model2 = scipr.SCIPR(match_algo=self.match,
-                             transform_algo=self.rigid_transform,
-                             input_normalization='l2')
-        model2.fit(self.A, self.B)
-        transformed2 = model2.transform(self.A)
-        self.assertTrue(np.array_equal(transformed, transformed2))
+        return adata, model
+
+    def test_009_anndata_transform(self):
+        """Test fit and transform with AnnData is equivalent to numpy"""
+        adata, model = self._test_anndata_helper()
+        transformed_adata, idx = model.transform_adata(adata, 'batch', 'A')
+        self.assertEqual(transformed_adata.shape[0], np.sum(idx))
+        transformed_np = model.transform(self.A)
+        self.assertTrue(np.array_equal(transformed_adata, transformed_np))
 
     def test_010_anndata_transform_inplace(self):
         """Test inplace transform of AnnData is equivalent to numpy"""
-        model = scipr.SCIPR(match_algo=self.match,
-                            transform_algo=self.rigid_transform,
-                            input_normalization='l2')
-        adata = anndata.AnnData(X=np.concatenate([self.A, self.B], axis=0),
-                                obs={'batch': (['A'] * self.A.shape[0]) +
-                                     (['B'] * self.B.shape[0])})
-        model.fit_adata(adata, 'batch', 'A', 'B')
+        adata, model = self._test_anndata_helper()
         model.transform_adata(adata, 'batch', 'A', inplace=True)
-        transformed = adata[adata.obs['batch'] == 'A'].X
-        print(f'transformed.shape: {transformed.shape}')
-        model2 = scipr.SCIPR(match_algo=self.match,
-                             transform_algo=self.rigid_transform,
-                             input_normalization='l2')
-        model2.fit(self.A, self.B)
-        transformed2 = model2.transform(self.A)
-        print(type(transformed2))
-        print(self.A.shape)
-        print(f'transformed2.shape: {transformed2.shape}')
-        self.assertTrue(np.array_equal(transformed, transformed2))
+        transformed_adata = adata[adata.obs['batch'] == 'A'].X
+        transformed_np = model.transform(self.A)
+        self.assertTrue(np.array_equal(transformed_adata, transformed_np))
