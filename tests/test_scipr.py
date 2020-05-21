@@ -72,7 +72,17 @@ class TestScipr(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             model.transform(self.A)
 
-    def test_004_test_logging(self):
+    def test_004_test_transform_same_shape(self):
+        """Test tranforming returns data of same shape as input"""
+        model = scipr.SCIPR(match_algo=self.match,
+                            transform_algo=self.rigid_transform,
+                            input_normalization='l2')
+        model.fit(self.A, self.B)
+        transformed = model.transform(self.A)
+        self.assertEqual(self.A.shape, transformed.shape)
+
+    def test_005_test_logging(self):
+        """Test fit function emits logging information"""
         with self.assertLogs(level='INFO') as cm:
             model = scipr.SCIPR(match_algo=self.match,
                                 transform_algo=self.rigid_transform,
@@ -82,7 +92,9 @@ class TestScipr(unittest.TestCase):
                          ['INFO:scipr.scipr:Applying L2 normalization',
                           'INFO:scipr.scipr:Applying L2 normalization'])
 
-    def test_005_no_stdout_in_normal_conditions(self):
+    def test_006_no_stdout_in_normal_conditions(self):
+        """Test no output (silent) from SCIPR methods under normal
+        conditions (no warnings)"""
         f = io.StringIO()
         with redirect_stdout(f):
             model = scipr.SCIPR(match_algo=self.match,
@@ -93,7 +105,8 @@ class TestScipr(unittest.TestCase):
             model.transform(self.A)
         self.assertEqual(f.getvalue(), '')
 
-    def test_006_tensorboard_auto_directory(self):
+    def test_007_tensorboard_auto_directory(self):
+        """Test auto creates directory for event files if not specified"""
         f = io.StringIO()
         with redirect_stderr(f):
             model = scipr.SCIPR(match_algo=self.match,
@@ -108,7 +121,8 @@ class TestScipr(unittest.TestCase):
         event_file = list(tboard_path.iterdir())[-1].name
         self.assertIn('events.out.tfevents', event_file)
 
-    def test_007_tensorboard_custom_directory(self):
+    def test_008_tensorboard_custom_directory(self):
+        """Test creates specified directory for event files"""
         with tempfile.TemporaryDirectory() as tmp_dir:
             tboard_path = Path(tmp_dir)
             model = scipr.SCIPR(match_algo=self.match,
@@ -121,7 +135,8 @@ class TestScipr(unittest.TestCase):
             event_file = list(tboard_path.iterdir())[-1].name
             self.assertIn('events.out.tfevents', event_file)
 
-    def test_008_anndata_transform(self):
+    def test_009_anndata_transform(self):
+        """Test fit and transform with AnnData is equivalent to numpy"""
         model = scipr.SCIPR(match_algo=self.match,
                             transform_algo=self.rigid_transform,
                             input_normalization='l2')
@@ -137,7 +152,8 @@ class TestScipr(unittest.TestCase):
         transformed2 = model2.transform(self.A)
         self.assertTrue(np.array_equal(transformed, transformed2))
 
-    def test_008_anndata_transform_inplace(self):
+    def test_010_anndata_transform_inplace(self):
+        """Test inplace transform of AnnData is equivalent to numpy"""
         model = scipr.SCIPR(match_algo=self.match,
                             transform_algo=self.rigid_transform,
                             input_normalization='l2')
@@ -147,9 +163,13 @@ class TestScipr(unittest.TestCase):
         model.fit_adata(adata, 'batch', 'A', 'B')
         model.transform_adata(adata, 'batch', 'A', inplace=True)
         transformed = adata[adata.obs['batch'] == 'A'].X
+        print(f'transformed.shape: {transformed.shape}')
         model2 = scipr.SCIPR(match_algo=self.match,
                              transform_algo=self.rigid_transform,
                              input_normalization='l2')
         model2.fit(self.A, self.B)
         transformed2 = model2.transform(self.A)
+        print(type(transformed2))
+        print(self.A.shape)
+        print(f'transformed2.shape: {transformed2.shape}')
         self.assertTrue(np.array_equal(transformed, transformed2))
