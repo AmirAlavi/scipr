@@ -43,7 +43,15 @@ class SCIPR(object):
         self.input_normalization = input_normalization
         self.fitted = False
 
-    def fit(self, A, B):
+    def _log_hparams(self, tboard):
+        tboard.add_hparams(hparam_dict={
+            'match_algo': str(self.match_algo),
+            'transform_algo': str(self.transform_algo),
+            'n_iter': self.n_iter,
+            'input_normalization': self.input_normalization},
+                           metric_dict={})
+
+    def fit(self, A, B, tensorboard=False, tensorboard_dir=None):
         """Fit the model to align to a reference batch.
 
         Parameters
@@ -51,20 +59,40 @@ class SCIPR(object):
         A : numpy.ndarray
             The "source" batch of cells to align. Dimensions are
             (cellsA, genes).
+
         B : numpy.ndarray
             The "target" (or "reference") batch data to align to. ``A`` is
             aligned onto ``B``, where ``B`` is unchanged, and remains a
             stationary "reference". Dimensions are (cellsB, genes).
+
+        tensorboard : bool
+            If True, enable tensorboard logging of SCIPR algorithm metrics.
+
+        tensorboard_dir : None or str
+            If None, will use an automatically generated folder to store
+            tensorboard event files. If specified, will place event files in
+            the specified directory (creates it if it doesn't already exist).
         """
         log = logging.getLogger(__name__)
+        if tensorboard:
+            from torch.utils.tensorboard import SummaryWriter
+            tboard = SummaryWriter(log_dir=tensorboard_dir)
+            if tensorboard_dir is None:
+                log.warning('tensorboard_dir is not specified, using auto ' +
+                            f'generated folder: {tboard.get_logdir()}')
+            self._log_hparams(tboard)
         A = self._apply_input_normalization(A)
         B = self._apply_input_normalization(B)
         kd_B = spatial.cKDTree(B)
         A_orig = A
         for i in range(self.n_iter):
             a_idx, b_idx, distances = self.match_algo(A, B, kd_B)
+            avg_distance = np.mean(distances)
             log.info(f'SCIPR step {i}, n-pairs: {len(a_idx)}, ' +
-                     f'avg distances: {np.mean(distances)}')
+                     f'avg distance: {avg_distance}')
+            if tensorboard:
+                tboard.add_scalar('num_pairs', len(a_idx), i)
+                tboard.add_scalar('avg_distance', avg_distance, i)
             step_model = self.transform_algo._fit_step(A[a_idx], B[b_idx], i)
             A = self.transform_algo.transform(step_model, A)
         self.transform_algo._finalize(A_orig, A)
