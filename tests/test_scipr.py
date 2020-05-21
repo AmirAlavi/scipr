@@ -10,6 +10,7 @@ from pathlib import Path
 import tempfile
 
 import numpy as np
+import anndata
 
 import scipr
 from scipr.matching import Closest
@@ -119,3 +120,36 @@ class TestScipr(unittest.TestCase):
             self.assertTrue(tboard_path.exists())
             event_file = list(tboard_path.iterdir())[-1].name
             self.assertIn('events.out.tfevents', event_file)
+
+    def test_008_anndata_transform(self):
+        model = scipr.SCIPR(match_algo=self.match,
+                            transform_algo=self.rigid_transform,
+                            input_normalization='l2')
+        adata = anndata.AnnData(X=np.concatenate([self.A, self.B], axis=0),
+                                obs={'batch': (['A'] * self.A.shape[0]) +
+                                     (['B'] * self.B.shape[0])})
+        model.fit_adata(adata, 'batch', 'A', 'B')
+        transformed, idx = model.transform_adata(adata, 'batch', 'A')
+        model2 = scipr.SCIPR(match_algo=self.match,
+                             transform_algo=self.rigid_transform,
+                             input_normalization='l2')
+        model2.fit(self.A, self.B)
+        transformed2 = model2.transform(self.A)
+        self.assertTrue(np.array_equal(transformed, transformed2))
+
+    def test_008_anndata_transform_inplace(self):
+        model = scipr.SCIPR(match_algo=self.match,
+                            transform_algo=self.rigid_transform,
+                            input_normalization='l2')
+        adata = anndata.AnnData(X=np.concatenate([self.A, self.B], axis=0),
+                                obs={'batch': (['A'] * self.A.shape[0]) +
+                                     (['B'] * self.B.shape[0])})
+        model.fit_adata(adata, 'batch', 'A', 'B')
+        model.transform_adata(adata, 'batch', 'A', inplace=True)
+        transformed = adata[adata.obs['batch'] == 'A'].X
+        model2 = scipr.SCIPR(match_algo=self.match,
+                             transform_algo=self.rigid_transform,
+                             input_normalization='l2')
+        model2.fit(self.A, self.B)
+        transformed2 = model2.transform(self.A)
+        self.assertTrue(np.array_equal(transformed, transformed2))

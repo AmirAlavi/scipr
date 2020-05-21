@@ -12,13 +12,14 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['scikit-learn', 'numpy', 'scipy', 'torch>=1.2']
 
-extra_requirements = {
-        'tensorboard':  ['tensorboard>=1.14'],
-}
+test_requirements = ['anndata']
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
+extra_requirements = {
+        'tensorboard':  ['tensorboard>=1.14'],
+        'test': test_requirements
+}
 
 setup(
     author="Amir Alavi",

@@ -98,6 +98,9 @@ class SCIPR(object):
         self.transform_algo._finalize(A_orig, A)
         self.fitted = True
 
+    def fit_adata(self, adata, batch_key, source, target):
+        raise NotImplementedError
+
     def transform(self, A):
         """Apply alignment to a batch of cells.
 
@@ -123,6 +126,9 @@ class SCIPR(object):
             raise RuntimeError('Must call "fit" before "transform"!')
         A = self._apply_input_normalization(A)
         return self.transform_algo._transform(A)
+
+    def transform_adata(self, adata, batch_key, batch, inplace=False):
+        raise NotImplementedError
 
     def _apply_input_normalization(self, X):
         log = logging.getLogger(__name__)
