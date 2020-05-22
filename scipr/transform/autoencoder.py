@@ -1,3 +1,5 @@
+import logging
+
 import torch
 import torch.nn as nn
 
@@ -138,10 +140,12 @@ class StackedAutoEncoder(Transformer):
         self.epochs = epochs
         self.device = torch.device(
             'cuda' if torch.cuda.is_available() else 'cpu')
-        print('Using device {}'.format(self.device))
+        log = logging.getLogger(__name__)
+        log.info(f'Using device {self.device}')
         super().__init__()
 
     def fit(self, A, B):
+        log = logging.getLogger(__name__)
         d = A.shape[1]
         A = torch.from_numpy(A).float().to(self.device)
         B = torch.from_numpy(B).float().to(self.device)
@@ -159,7 +163,7 @@ class StackedAutoEncoder(Transformer):
             optimizer.zero_grad()
             loss = torch.mean(torch.norm(f(A) - B, p=2, dim=1)**2)
             if e % 100 == 0:
-                print(f'\tEpoch: {e}/{self.epochs}, loss: {loss.item()}')
+                log.info(f'\tEpoch: {e}/{self.epochs}, loss: {loss.item()}')
             loss.backward()
             optimizer.step()
         model = {
@@ -182,5 +186,6 @@ class StackedAutoEncoder(Transformer):
         return model
 
     def finalize(self, model, A_orig, A_final):
-        print(model)
+        log = logging.getLogger(__name__)
+        log.info('Final model:\n' + str(model))
         return model

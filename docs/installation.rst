@@ -1,5 +1,7 @@
 .. highlight:: shell
 
+.. _install:
+
 ============
 Installation
 ============
@@ -14,7 +16,15 @@ To install scipr, run this command in your terminal:
 
     $ pip install scipr
 
-This is the preferred method to install scipr, as it will always install the most recent stable release.
+If you would like to use the optional TensorBoard logging features of scipr,
+install scipr with this command instead:
+
+.. code-block:: console
+
+    $ pip install scipr[tensorboard]
+
+The above are the preferred methods to install scipr, as they will always
+install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.

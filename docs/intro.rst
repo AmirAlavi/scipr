@@ -81,6 +81,32 @@ suited to scRNA-seq data::
     model.fit(batch_A, batch_B)
     batch_A_aligned = model.trasform(batch_A)
 
+*******
+Logging
+*******
+
+scipr uses Python's built-in logging module to report informational messages
+and training metrics (e.g. loss values at each gradient descent iteration), and
+so normally you should see nothing printed to `stdout` (unless it's warning
+message). If you would like to see this informational text, configure the
+Python logger with the appropriate level like so::
+
+   import logging
+   logging.basicConfig(level=logging.INFO)
+
+===========
+TensorBoard
+===========
+
+Some scipr functions can be enabled with
+`TensorBoard <https://www.tensorflow.org/tensorboard/>`_ logging, giving you a
+useful "dashboard" view of model metrics as the SCIPR model is fit, as in the
+example screenshot below. It can be very useful for debugging an alignment. See
+:ref:`install` for enabling this feature.
+
+.. image:: /_static/tensorboard-example.png
+        :alt: TensorBoard logging dashboard example
+
 .. rubric:: References
 
 .. [GHJV94] Gamma, E., Helm, R., Johnson, R., & Vlissides, J. (1994).

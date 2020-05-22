@@ -65,7 +65,7 @@ class Transformer(ABC):
         pass
 
     def _transform(self, A):
-        self.transform(self._model, A)
+        return self.transform(self._model, A)
 
     @abstractmethod
     def chain(self, model, step_model, step_number):

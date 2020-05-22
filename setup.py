@@ -12,9 +12,14 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['scikit-learn', 'numpy', 'scipy', 'torch>=1.2']
 
+test_requirements = ['anndata']
+
 setup_requirements = [ ]
 
-test_requirements = [ ]
+extra_requirements = {
+        'tensorboard':  ['tensorboard>=1.14'],
+        'test': test_requirements
+}
 
 setup(
     author="Amir Alavi",
@@ -32,6 +37,7 @@ setup(
     ],
     description="Single Cell Iterative Point set Registration (SCIPR)",
     install_requires=requirements,
+    extras_require=extra_requirements,
     license="BSD license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
