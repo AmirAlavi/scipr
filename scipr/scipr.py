@@ -75,7 +75,12 @@ class SCIPR(object):
         """
         log = logging.getLogger(__name__)
         if tensorboard:
-            from torch.utils.tensorboard import SummaryWriter
+            try:
+                from torch.utils.tensorboard import SummaryWriter
+            except ImportError:
+                raise ImportError('SCIPR Tensorboard logging requires extra ' +
+                                  "dependencies, install them via 'pip " +
+                                  "install scipr[tensorboard]'")
             tboard = SummaryWriter(log_dir=tensorboard_dir)
             if tensorboard_dir is None:
                 log.warning('tensorboard_dir is not specified, using auto ' +
