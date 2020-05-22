@@ -16,7 +16,7 @@ Single Cell Iterative Point set Registration (SCIPR)
 
 
 * Free software: BSD license
-* Documentation: https://scipr.readthedocs.io.
+* Homepage & Documentation: https://scipr.readthedocs.io.
 
 Credits
 -------
