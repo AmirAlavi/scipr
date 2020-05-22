@@ -9,7 +9,20 @@ SCIPR Model
 ***********
 
 .. autoclass:: scipr.SCIPR
-   :members:
+
+   .. rubric:: Methods
+
+   .. autosummary::
+
+      ~fit
+      ~fit_adata
+      ~transform
+      ~transform_adata
+
+   .. automethod:: scipr.SCIPR.fit
+   .. automethod:: scipr.SCIPR.fit_adata
+   .. automethod:: scipr.SCIPR.transform
+   .. automethod:: scipr.SCIPR.transform_adata
 
 ******************
 Matching Functions
