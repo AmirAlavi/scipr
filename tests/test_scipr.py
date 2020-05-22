@@ -105,6 +105,12 @@ class TestScipr(unittest.TestCase):
             model.transform(self.A)
         self.assertEqual(f.getvalue(), '')
 
+    def _does_folder_contain_event_file(self, folder):
+        for f in folder.iterdir():
+            if 'events.out.tfevents' in f.name:
+                return True
+        return False
+
     def test_007_tensorboard_auto_directory(self):
         """Test auto creates directory for event files if not specified"""
         f = io.StringIO()
@@ -118,8 +124,7 @@ class TestScipr(unittest.TestCase):
         self.assertIn('tensorboard_dir is not specified', stdout)
         tboard_path = Path(stdout.split()[-1])
         self.assertTrue(tboard_path.exists())
-        event_file = list(tboard_path.iterdir())[-1].name
-        self.assertIn('events.out.tfevents', event_file)
+        self.assertTrue(self._does_folder_contain_event_file(tboard_path))
 
     def test_008_tensorboard_custom_directory(self):
         """Test creates specified directory for event files"""
@@ -132,8 +137,7 @@ class TestScipr(unittest.TestCase):
             model.fit(self.A, self.B, tensorboard=True,
                       tensorboard_dir=tboard_path)
             self.assertTrue(tboard_path.exists())
-            event_file = list(tboard_path.iterdir())[-1].name
-            self.assertIn('events.out.tfevents', event_file)
+            self.assertTrue(self._does_folder_contain_event_file(tboard_path))
 
     def _test_anndata_helper(self):
         model = scipr.SCIPR(match_algo=self.match,

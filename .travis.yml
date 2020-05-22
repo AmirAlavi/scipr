@@ -13,5 +13,5 @@ deploy:
     secure: FAOzQpoJtQZeg2NaxlLFt+Pb2D9jrBWwtAjVwwdWFZtF1ZcfqjNu5eq68b4AoHNwEPW/1vCKrgLlMZdN/GEGrfvhdyt17Xwl4Vuovu4cSvUnIJkTRYtM6pvczC1xdrF73IBe63JqgolKxh/gr+svkz3afW433DoFzdB8nMuVc6EMWSBK9iveSJ2bCjyi00fk2ZgmFiMOpzfK9WUvM8BTu5JcUMJiBaLi6FqBHUYR7+sUlql0LPaH567Wa0AZYAWziOY8ajezSMhLGaqpx2OTrn2b02ybgYk+GBSid/+dQTyzTn653W3O8FHmQy8hbm6trryZmaNV27BnhapyF7sXeh+B3A3YxzvU7Xmv/0KEfc4N9Ok4QJtdsUngH2zJ77JzdPToK44lOzTJqZyBGBwbv0vJhOUlnDcAbFheKSoP64bWwFzpYwBuDoMxw+8QU4cZ6YqM+MhjwULtPhWRWRSL8QW69n3+am3KqjW8M+95koQ2wvAdZ9p2M4vasgl3dhC+fFs+SwnurHb0432wBKT5zxpvIQ/U7+pQf4KQoZAtP2ulJuP86TiDfj5ZohICIUOkjRThoQNzc4O11uXLwQngDdMCwBrbmE7nW5uHS6e4ptzSpVyskHmFsG0CWhqhOr5SE5a/0MnGNKb13vB4QKIU4b19Eguflx7m3gJnNMRU6Xs=
   on:
     tags: true
-    repo: amiralavi/scipr
+    repo: AmirAlavi/scipr
     python: 3.8
