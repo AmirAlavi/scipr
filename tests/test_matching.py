@@ -50,7 +50,6 @@ class TestMatching(unittest.TestCase):
         """Test MNN matching strategy A -> B"""
         match = MNN(k=1)
         a_idx, b_idx, distances = match(self.A, self.B, self.kd_B)
-        print(a_idx)
         self.assertTrue(np.array_equal(a_idx, [1]))
         self.assertTrue(np.array_equal(b_idx, [1]))
 
