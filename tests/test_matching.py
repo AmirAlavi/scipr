@@ -48,7 +48,7 @@ class TestMatching(unittest.TestCase):
 
     def test_002_MNN_A2B(self):
         """Test MNN matching strategy A -> B"""
-        match = MNN(k=2)
+        match = MNN(k=1)
         a_idx, b_idx, distances = match(self.A, self.B, self.kd_B)
         print(a_idx)
         self.assertTrue(np.array_equal(a_idx, [1]))
@@ -56,7 +56,7 @@ class TestMatching(unittest.TestCase):
 
     def test_003_MNN_B2A(self):
         """Test MNN matching strategy B -> A"""
-        match = MNN(k=2)
+        match = MNN(k=1)
         a_idx, b_idx, distances = match(self.B, self.A, self.kd_A)
         self.assertTrue(np.array_equal(a_idx, [1]))
         self.assertTrue(np.array_equal(b_idx, [1]))
