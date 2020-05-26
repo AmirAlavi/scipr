@@ -93,7 +93,8 @@ class SCIPR(object):
         for i in range(self.n_iter):
             a_idx, b_idx, distances = self.match_algo(A, B, kd_B)
             avg_distance = np.mean(distances)
-            log.info(f'SCIPR step {i}, n-pairs: {len(a_idx)}, ' +
+            log.info(f'SCIPR step {i + 1}/{self.n_iter}, ' +
+                     f'n-pairs: {len(a_idx)}, ' +
                      f'avg distance: {avg_distance}')
             if tensorboard:
                 tboard.add_scalar('num_pairs', len(a_idx), i)
