@@ -197,11 +197,11 @@ class SCIPR(object):
         -------
         transformed : numpy.ndarray
             The aligned batch of cells, same shape as input batch. Only
-            provided if `inplace` is True.
+            provided if `inplace` is False.
 
         indexer : numpy.ndarray
             Boolean row indexer into `adata` of the transformed cells. Only
-            provided if `inplace` is True.
+            provided if `inplace` is False.
 
         Raises
         ------
