@@ -6,4 +6,4 @@ __all__ = ['SCIPR']
 
 __author__ = """Amir Alavi"""
 __email__ = 'amiralavi@cmu.edu'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
