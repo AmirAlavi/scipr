@@ -192,8 +192,11 @@ class MNN(Match):
         t0 = datetime.datetime.now()
         kd_A = spatial.cKDTree(A)
 
-        distances_a2b, B_nb_indices = kd_tree_B.query(A, self.k)
-        distances_b2a, A_nb_indices = kd_A.query(B, self.k)
+        _, B_nb_indices = kd_tree_B.query(A, self.k)
+        _, A_nb_indices = kd_A.query(B, self.k)
+        if self.k == 1:
+            B_nb_indices = np.expand_dims(B_nb_indices, 1)
+            A_nb_indices = np.expand_dims(A_nb_indices, 1)
         A_indices, B_indices, distances = [], [], []
         for a_idx, b_neighbors in enumerate(B_nb_indices):
             for b_idx, a_neighbors in enumerate(A_nb_indices):

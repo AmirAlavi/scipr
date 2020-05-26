@@ -93,7 +93,8 @@ class SCIPR(object):
         for i in range(self.n_iter):
             a_idx, b_idx, distances = self.match_algo(A, B, kd_B)
             avg_distance = np.mean(distances)
-            log.info(f'SCIPR step {i}, n-pairs: {len(a_idx)}, ' +
+            log.info(f'SCIPR step {i + 1}/{self.n_iter}, ' +
+                     f'n-pairs: {len(a_idx)}, ' +
                      f'avg distance: {avg_distance}')
             if tensorboard:
                 tboard.add_scalar('num_pairs', len(a_idx), i)
@@ -197,11 +198,11 @@ class SCIPR(object):
         -------
         transformed : numpy.ndarray
             The aligned batch of cells, same shape as input batch. Only
-            provided if `inplace` is True.
+            provided if `inplace` is False.
 
         indexer : numpy.ndarray
             Boolean row indexer into `adata` of the transformed cells. Only
-            provided if `inplace` is True.
+            provided if `inplace` is False.
 
         Raises
         ------
