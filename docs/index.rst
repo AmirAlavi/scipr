@@ -52,7 +52,7 @@ API documentation.
 Quick start
 ***********
 
-Learn a function to align to batches of scRNA-seq data::
+Learn a function to align two batches of scRNA-seq data::
 
    import scipr
    from scipr.matching import MNN
