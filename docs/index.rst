@@ -72,7 +72,7 @@ Learn more
 Read more about how scipr works in the :ref:`get-started` guide. For
 documentation on each of the functions available in scipr, see the :ref:`api`.
 This package is based on the methods presented in our
-`bioRxiv paper <https://www.biorxiv.org/content/10.1101/2020.05.13.093948v1>`_.
+`PLOS Computational Biology paper <https://doi.org/10.1371/journal.pcbi.1007939>`_.
 
 scipr is made available for free under a BSD license.
 
