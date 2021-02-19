@@ -3,7 +3,7 @@ Citing
 ######
 
 If scipr is useful for your research, please consider citing our
-`bioRxiv paper <https://www.biorxiv.org/content/10.1101/2020.05.13.093948v1>`_.
+`PLOS Computational Biology paper <https://doi.org/10.1371/journal.pcbi.1007939>`_.
 
 *******
 Credits
